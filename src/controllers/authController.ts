@@ -6,6 +6,7 @@ import { supabase } from '../config/supabaseClient';
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 const registerUser = async (req: Request, res: Response): Promise<any> => {
+  console.log("Register endpoint hit:", req.body);
   const { email, password } = req.body;
 
   const { data: existingUser } = await supabase
@@ -20,7 +21,10 @@ const registerUser = async (req: Request, res: Response): Promise<any> => {
 
   const { error } = await supabase.from('users').insert([{ email, password: hashedPassword }]);
 
-  if (error) return res.status(500).json({ message: 'Error creating user', error });
+  if (error) {
+    console.error("Supabase insert error:", JSON.stringify(error, null, 2)); 
+    return res.status(500).json({ message: 'Error creating user', error });
+  }
 
   res.status(201).json({ message: 'User registered successfully' });
 };
